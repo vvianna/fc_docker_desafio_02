@@ -3,6 +3,8 @@ version: '3'
 services:
   
   mysql:
+    build: 
+      context: ./mysql
     image: victorvianna87/fc_docker_mysql_desafio_02
     command: --innodb-use-native-aio=0 --explicit_defaults_for_timestamp
     container_name: mysql
@@ -10,33 +12,32 @@ services:
     tty: true
     networks:
       - node-network
-    ports:
-      - "3306:3306"
 
   nodejs:
+    build: 
+      context: ./node
     image: victorvianna87/fc_docker_node_desafio_02
     container_name: nodejs
     entrypoint: dockerize -wait tcp://mysql:3306 -timeout 30s docker-entrypoint.sh node index.js
+    tty: true
     networks:
       - node-network
     depends_on:
       - mysql
-    ports:
-      - "3000:3000"
-    tty: true
     
   nginx:
+    build: 
+      context: ./nginx
     image: victorvianna87/fc_docker_nginx_desafio_02
     container_name: nginx
-    #restart: always
+    tty: true
     networks:
       - node-network
     ports:
       - "8080:80"
     depends_on:
       - nodejs
-    tty: true
-    
+
 networks:
   node-network:
     driver: bridge
