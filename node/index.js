@@ -13,17 +13,27 @@ const connection = mysql.createConnection(config)
 const sql = `INSERT INTO people(name) values('Victor')`
 const select = `SELECT name FROM people`
 
-connection.query(sql)
-connection.end
-
 app.get('/', (req,res) => {
-    connection.query(select, function (err, rows, fields) {
+    connection.query(sql)
+    const result = connection.query(select, function (err, result, fields){
         if (err) throw err;
-        console.log(rows[0])
-        res.end('<h1>Hello Victor</h1> <br> <h2>Nome gravado no BD: ' + Object.values(rows[0]) + '</h2>')
-    })    
+        Object.keys(result).forEach(function(key) {
+            var row = result[key];
+            console.log(row.name)
+    })
+
+    var listaNomes = []
+    result.forEach(function(nome, i ){
+        listaNomes.push('<li>' + nome.name + '</li>');
+    })
+
+    res.send('<h1>Full Cycle Rocks!</h1>'
+    + '<h2>- Lista de nomes cadastrada no banco de dados.</h2>'
+    + listaNomes.join(""))
+    })
 })
 
 app.listen(port, () => {
-    console.log('Rodando na porta ' + port)
+    console.log('Rodando na porta ' + port + '. Somente via NGINX')
+    console.log('Acessar via NGINX :  http://localhost:8080')
 })
